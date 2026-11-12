@@ -11,7 +11,7 @@
 [scanner]
 provider = "google_flights_structured"
 providers = ["google_flights_structured"]
-database_path = "data/faresnipe.sqlite3"
+database_path = "data/rondflight.sqlite3"
 currency = "CLP"
 days_ahead_start = 7
 days_ahead_end = 60

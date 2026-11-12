@@ -27,7 +27,7 @@ def main(argv: list[str] | None = None) -> None:
     sub = parser.add_subparsers(dest="command", required=True)
 
     init_p = sub.add_parser("init", help="Create config/faresnipe.toml from the example.")
-    init_p.add_argument("--from", dest="origin", help="Keep only one origin, for example: SCL.")
+    init_p.add_argument("--from", dest="origins", help="Comma-separated origins, for example: YUL,YYZ.")
     init_p.add_argument("--to", dest="destinations", help="Comma-separated destinations, for example: EZE,MAD,YYZ.")
 
     run_p = sub.add_parser("run", help="Run a scan. Use --watch for continuous.")
@@ -49,9 +49,10 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.command == "init":
         destinations = _parse_destinations(args.destinations)
-        if destinations and not args.origin:
+        origins = _parse_origins(args.origins)
+        if destinations and not origins:
             parser.error("init --to requires --from")
-        init_config(Path(args.config), args.origin, destinations)
+        init_config(Path(args.config), origins, destinations)
         return
 
     config = load_config(args.config)
@@ -103,15 +104,17 @@ def main(argv: list[str] | None = None) -> None:
 
 def init_config(
     dest: Path = DEFAULT_CONFIG,
-    origin: str | None = None,
+    origins: str | tuple[str, ...] = (),
     destinations: tuple[str, ...] = (),
 ) -> None:
+    if isinstance(origins, str):
+        origins = (origins.strip().upper(),) if origins.strip() else ()
     if dest.exists():
         print(f"{dest} already exists; leaving it untouched.")
         return
     try:
-        if origin:
-            _write_origin_config(dest, origin.upper(), destinations)
+        if origins:
+            _write_origins_config(dest, origins, destinations)
         else:
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(_example_config_path(), dest)
@@ -124,32 +127,42 @@ def init_config(
     print("Use `faresnipe serve` to open the dashboard.")
 
 
-def _write_origin_config(dest: Path, origin: str, destinations: tuple[str, ...] = ()) -> None:
+def _write_origins_config(
+    dest: Path, origins: tuple[str, ...], destinations: tuple[str, ...] = ()
+) -> None:
     import tomllib
 
     example_path = _example_config_path()
     data = tomllib.loads(example_path.read_text(encoding="utf-8"))
-    origins = [item for item in data.get("origins", []) if str(item.get("code", "")).upper() == origin]
-    if not origins:
-        raise OSError(f"origin {origin} not found in {example_path}")
+    origin_set = {code.upper() for code in origins}
+    selected = [
+        item for item in data.get("origins", [])
+        if str(item.get("code", "")).upper() in origin_set
+    ]
+    found_codes = {str(item.get("code", "")).upper() for item in selected}
+    missing_origins = origin_set - found_codes
+    if missing_origins:
+        raise OSError(
+            f"origin(s) not found in {example_path}: {', '.join(sorted(missing_origins))}"
+        )
     destination_filter = set(destinations)
     if destination_filter:
-        for item in origins:
+        for item in selected:
             item["destinations"] = [
                 str(destination).upper()
                 for destination in item.get("destinations", [])
                 if str(destination).upper() in destination_filter
             ]
-        missing = destination_filter - {
-            destination
-            for item in origins
-            for destination in item.get("destinations", [])
-        }
-        if missing:
-            raise OSError(f"destination(s) not configured for {origin}: {', '.join(sorted(missing))}")
+        for item in selected:
+            code = str(item.get("code", "")).upper()
+            missing = destination_filter - {str(d).upper() for d in item.get("destinations", [])}
+            if missing:
+                raise OSError(
+                    f"destination(s) not configured for {code}: {', '.join(sorted(missing))}"
+                )
     thresholds = [
         item for item in data.get("route_thresholds", [])
-        if str(item.get("origin", "")).upper() == origin
+        if str(item.get("origin", "")).upper() in origin_set
         and (not destination_filter or str(item.get("destination", "")).upper() in destination_filter)
     ]
     dest.parent.mkdir(parents=True, exist_ok=True)
@@ -180,11 +193,12 @@ def _write_origin_config(dest: Path, origin: str, destinations: tuple[str, ...] 
         'telegram_chat_id = ""',
         "",
     ]
-    for item in origins:
+    for item in selected:
+        code = str(item.get("code", "")).upper()
         lines.extend([
             "[[origins]]",
-            f'code = "{origin}"',
-            f'name = "{item.get("name", origin)}"',
+            f'code = "{code}"',
+            f'name = "{item.get("name", code)}"',
             "destinations = [" + ", ".join(f'"{d}"' for d in item.get("destinations", [])) + "]",
             f"default_max_price = {item.get('default_max_price', 0)}",
             f"default_mistake_fare_below = {item.get('default_mistake_fare_below', 0)}",
@@ -194,7 +208,7 @@ def _write_origin_config(dest: Path, origin: str, destinations: tuple[str, ...] 
     for item in thresholds:
         lines.extend([
             "[[route_thresholds]]",
-            f'origin = "{origin}"',
+            f'origin = "{item["origin"]}"',
             f'destination = "{item["destination"]}"',
             f"max_price = {item['max_price']}",
             f"mistake_fare_below = {item['mistake_fare_below']}",
@@ -208,6 +222,13 @@ def _parse_destinations(value: str | None) -> tuple[str, ...]:
         return ()
     destinations = [item.strip().upper() for item in value.split(",") if item.strip()]
     return tuple(dict.fromkeys(destinations))
+
+
+def _parse_origins(value: str | None) -> tuple[str, ...]:
+    if not value:
+        return ()
+    origins = [item.strip().upper() for item in value.split(",") if item.strip()]
+    return tuple(dict.fromkeys(origins))
 
 
 def _example_config_path() -> Path:

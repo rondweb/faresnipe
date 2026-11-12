@@ -65,7 +65,7 @@ class CliTest(unittest.TestCase):
     def test_init_can_filter_destinations(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             dest = Path(tmpdir) / "faresnipe.toml"
-            init_config(dest, "SCL", ("EZE",))
+            init_config(dest, ("SCL",), ("EZE",))
 
             text = dest.read_text(encoding="utf-8")
 
@@ -73,6 +73,49 @@ class CliTest(unittest.TestCase):
         self.assertIn('"EZE"', text)
         self.assertNotIn('"MAD"', text)
         self.assertIn("max_price = 400", text)
+
+    def test_init_accepts_single_origin_as_string(self) -> None:
+        # Backward-compatible call with a bare string for origins.
+        with tempfile.TemporaryDirectory() as tmpdir:
+            dest = Path(tmpdir) / "faresnipe.toml"
+            init_config(dest, "SCL", ("EZE",))
+
+            text = dest.read_text(encoding="utf-8")
+
+        self.assertIn('code = "SCL"', text)
+        self.assertIn('"EZE"', text)
+
+    def test_init_can_filter_multiple_origins(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            dest = Path(tmpdir) / "faresnipe.toml"
+            init_config(dest, ("YUL", "YYZ"), ("GRU", "CGN", "VCP"))
+
+            text = dest.read_text(encoding="utf-8")
+
+        self.assertIn('code = "YUL"', text)
+        self.assertIn('code = "YYZ"', text)
+        self.assertIn('"GRU"', text)
+        self.assertIn('"CGN"', text)
+        self.assertIn('"VCP"', text)
+        # Thresholds for both origins should be present.
+        self.assertIn('origin = "YUL"', text)
+        self.assertIn('origin = "YYZ"', text)
+        # Destinations not requested should be absent.
+        self.assertNotIn('"SCL"', text)
+        self.assertNotIn('"EZE"', text)
+
+    def test_init_multiple_origins_via_cli(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            dest = Path(tmpdir) / "faresnipe.toml"
+            main(["--config", str(dest), "init", "--from", "YUL,YYZ", "--to", "GRU,CGN,VCP"])
+
+            text = dest.read_text(encoding="utf-8")
+
+        self.assertIn('code = "YUL"', text)
+        self.assertIn('code = "YYZ"', text)
+        self.assertIn('"GRU"', text)
+        self.assertIn('"CGN"', text)
+        self.assertIn('"VCP"', text)
 
 
 if __name__ == "__main__":

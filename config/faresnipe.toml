@@ -1,0 +1,76 @@
+[scanner]
+provider = "google_flights_structured"
+database_path = "data/faresnipe.sqlite3"
+currency = "USD"
+days_ahead_start = 7
+days_ahead_end = 30
+stay_lengths = [7, 14]
+adults = 1
+max_results_per_search = 8
+request_delay_seconds = 0.2
+scan_interval_minutes = 30
+scan_jitter_seconds = 60
+
+[detection]
+discount_ratio = 0.35
+mistake_fare_ratio = 0.55
+min_history_quotes = 4
+history_days = 180
+
+[notifications]
+console = true
+webhook_url = ""
+telegram_bot_token = ""
+telegram_chat_id = ""
+
+[[origins]]
+code = "YUL"
+name = "Montreal"
+destinations = ["CGN", "GRU", "VCP"]
+default_max_price = 500
+default_mistake_fare_below = 250
+enabled = true
+
+[[origins]]
+code = "YYZ"
+name = "Toronto"
+destinations = ["CGN", "GRU", "VCP"]
+default_max_price = 500
+default_mistake_fare_below = 250
+enabled = true
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "GRU"
+max_price = 800
+mistake_fare_below = 420
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "VCP"
+max_price = 800
+mistake_fare_below = 420
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "CGN"
+max_price = 600
+mistake_fare_below = 320
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "CGN"
+max_price = 600
+mistake_fare_below = 320
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "GRU"
+max_price = 800
+mistake_fare_below = 420
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "VCP"
+max_price = 800
+mistake_fare_below = 420

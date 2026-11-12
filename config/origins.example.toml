@@ -3,7 +3,7 @@
 
 [scanner]
 provider = "google_flights_structured"
-database_path = "data/faresnipe.sqlite3"
+database_path = "data/rondflight.sqlite3"
 currency = "USD"
 days_ahead_start = 7
 days_ahead_end = 30
@@ -62,6 +62,40 @@ destinations = [
 ]
 default_max_price = 450
 default_mistake_fare_below = 225
+enabled = true
+
+[[origins]]
+code = "YUL"
+name = "Montreal"
+destinations = [
+  # Canada
+  "YYZ", "YVR", "YOW", "YYC", "YEG", "YHZ",
+  # USA
+  "JFK", "BOS", "MIA", "LAX", "ORD", "ATL", "DFW",
+  # Europe
+  "CDG", "LHR", "FRA", "AMS", "DUB", "MAD", "FCO", "CGN",
+  # Latin America / Caribbean
+  "CUN", "PUJ", "BOG", "LIM", "SCL", "EZE", "GRU", "VCP",
+]
+default_max_price = 500
+default_mistake_fare_below = 250
+enabled = true
+
+[[origins]]
+code = "YYZ"
+name = "Toronto"
+destinations = [
+  # Canada
+  "YUL", "YVR", "YOW", "YYC", "YEG", "YHZ",
+  # USA
+  "JFK", "BOS", "MIA", "LAX", "ORD", "ATL", "DFW", "SFO", "SEA",
+  # Europe
+  "CDG", "LHR", "FRA", "AMS", "DUB", "MAD", "FCO", "CGN",
+  # Latin America / Caribbean
+  "CUN", "PUJ", "BOG", "LIM", "SCL", "EZE", "GRU", "VCP",
+]
+default_max_price = 500
+default_mistake_fare_below = 250
 enabled = true
 
 # Per-route overrides (optional). Applied after the origin default.
@@ -148,3 +182,181 @@ origin = "SCL"
 destination = "CDG"
 max_price = 1100
 mistake_fare_below = 550
+
+# YUL (Montreal) route overrides
+[[route_thresholds]]
+origin = "YUL"
+destination = "YYZ"
+max_price = 300
+mistake_fare_below = 150
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "YVR"
+max_price = 500
+mistake_fare_below = 280
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "CDG"
+max_price = 600
+mistake_fare_below = 320
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "LHR"
+max_price = 650
+mistake_fare_below = 350
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "JFK"
+max_price = 350
+mistake_fare_below = 180
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "MIA"
+max_price = 450
+mistake_fare_below = 240
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "CUN"
+max_price = 450
+mistake_fare_below = 230
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "LAX"
+max_price = 500
+mistake_fare_below = 270
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "FRA"
+max_price = 600
+mistake_fare_below = 320
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "DUB"
+max_price = 550
+mistake_fare_below = 290
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "SCL"
+max_price = 800
+mistake_fare_below = 420
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "EZE"
+max_price = 850
+mistake_fare_below = 450
+
+# YUL -> Brazil
+[[route_thresholds]]
+origin = "YUL"
+destination = "GRU"
+max_price = 800
+mistake_fare_below = 420
+
+[[route_thresholds]]
+origin = "YUL"
+destination = "VCP"
+max_price = 800
+mistake_fare_below = 420
+
+# YUL -> Cologne
+[[route_thresholds]]
+origin = "YUL"
+destination = "CGN"
+max_price = 600
+mistake_fare_below = 320
+
+# YYZ (Toronto) route overrides
+[[route_thresholds]]
+origin = "YYZ"
+destination = "YUL"
+max_price = 300
+mistake_fare_below = 150
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "YVR"
+max_price = 500
+mistake_fare_below = 280
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "CDG"
+max_price = 600
+mistake_fare_below = 320
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "LHR"
+max_price = 650
+mistake_fare_below = 350
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "JFK"
+max_price = 350
+mistake_fare_below = 180
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "MIA"
+max_price = 450
+mistake_fare_below = 240
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "CUN"
+max_price = 450
+mistake_fare_below = 230
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "LAX"
+max_price = 500
+mistake_fare_below = 270
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "FRA"
+max_price = 600
+mistake_fare_below = 320
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "CGN"
+max_price = 600
+mistake_fare_below = 320
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "SCL"
+max_price = 800
+mistake_fare_below = 420
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "EZE"
+max_price = 850
+mistake_fare_below = 450
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "GRU"
+max_price = 800
+mistake_fare_below = 420
+
+[[route_thresholds]]
+origin = "YYZ"
+destination = "VCP"
+max_price = 800
+mistake_fare_below = 420

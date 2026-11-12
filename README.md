@@ -16,7 +16,7 @@ Mistake fares disappear in minutes. Paid services like Going.com charge $60/yr t
 
 ```bash
 pip install faresnipe
-faresnipe init --from YOUR_AIRPORT --to EZE,MAD,YYZ
+faresnipe init --from YUL,YYZ --to GRU,CGN,VCP
 faresnipe run
 faresnipe serve
 ```
@@ -135,7 +135,7 @@ Experimental providers live under `src/faresnipe/providers/experimental/` and ar
 
 ## Commands
 
-`faresnipe init` creates `config/faresnipe.toml` from the example, optionally scoped with `--from SCL`.
+`faresnipe init` creates `config/faresnipe.toml` from the example, optionally scoped with `--from YUL,YYZ --to GRU,CGN,VCP`. Both `--from` and `--to` accept comma-separated IATA codes.
 
 `faresnipe run` runs one scan; add `--watch` for continuous scanning and `--limit` while testing.
 

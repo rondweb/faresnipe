@@ -1,0 +1,46 @@
+# faresnipe-multiuser configuration
+
+[database]
+# SQLite for development: "sqlite:///data/faresnipe_multiuser.sqlite3"
+# PostgreSQL for production: "postgresql://user:pass@localhost:5432/faresnipe"
+url = "sqlite:///data/faresnipe_multiuser.sqlite3"
+
+[telegram]
+# Bot token (can also be set via FARESNIPE_MULTI_TELEGRAM_BOT_TOKEN env var)
+bot_token = ""
+polling_timeout = 30
+polling_interval = 1.0
+
+[freemium]
+# Free tier: max notifications per subscriber per day
+free_tier_per_subscriber_daily_limit = 3
+# Free tier: max notifications across ALL free subscribers per day (anti-abuse)
+free_tier_global_daily_limit = 100
+# Premium tier: max notifications per day (0 = unlimited)
+premium_tier_daily_limit = 0
+# Free tier: minimum discount ratio to receive a notification (0.35 = 35%)
+free_tier_min_discount = 0.35
+# Priority values (lower = delivered first)
+premium_priority = 0
+free_priority = 1
+# Delivery batch size and rate limiting
+delivery_batch_size = 50
+delivery_delay_seconds = 0.5
+
+[scanner]
+provider = "google_flights_structured"
+currency = "USD"
+days_ahead_start = 7
+days_ahead_end = 120
+stay_lengths = [7, 14]
+adults = 1
+max_results_per_search = 8
+request_delay_seconds = 0.3
+scan_interval_minutes = 30
+scan_jitter_seconds = 60
+
+[detection]
+discount_ratio = 0.35
+mistake_fare_ratio = 0.55
+min_history_quotes = 4
+history_days = 180
